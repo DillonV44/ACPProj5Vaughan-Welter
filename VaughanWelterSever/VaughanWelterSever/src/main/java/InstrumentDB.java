@@ -1,6 +1,6 @@
 /****************************************************
  
-@author Dillon Vaughn, Anthony Welter
+@author Dillon Vaughan, Anthony Welter
 File Name: InstrumentDB.java
 COP4027	Project #: 5
 
