@@ -15,7 +15,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 
-public class Client extends Application{
+public class ClientView extends Application{
 	
 	public static void main(String[] args) {
 		Application.launch(args);

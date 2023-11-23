@@ -16,9 +16,11 @@ public class MusicRequest implements Runnable {
    private Socket s;
    private Scanner in;
    private PrintWriter out;
+   private InstrumentDB instrumentDB;
    
    public MusicRequest(Socket aSocket) {
 	   s = aSocket;
+	
    }
    
    /**
@@ -31,7 +33,15 @@ public class MusicRequest implements Runnable {
       try
       {
          try
-         {
+         {	
+           // Try creating the db, drop it first, then create the db.
+    	   try {
+    			instrumentDB = new InstrumentDB();
+    		} catch (Exception e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+    	   	// create scanners and print writer 
             in = new Scanner(s.getInputStream());
             out = new PrintWriter(s.getOutputStream());
             doService();            
@@ -69,9 +79,27 @@ public class MusicRequest implements Runnable {
 	 */
 	 public void executeCommand(String command) {
 		 
-		System.out.println("Command at start of executeCommand is " + command);
+		 System.out.println("Command at start of executeCommand is " + command);
+		 
+		 String type = "";
+		 String brand = "";
+		 String maxCost = "";
+		 String location = "";
+		 
+		 if (command.equals("RETRIEVE")) {
+			 type = in.next();
+			 brand = in.next();
+			 maxCost = in.next();
+			 location = in.next();
+		 }
+		 
+		 System.out.println("Here is what I got from the client");
+		 
+		 System.out.println("Type is: " + type + "\nBrand is: " + brand + "\nMax Cost is: " + maxCost + "\nLocation is: " + location);
+		 
+		 out.print("Thanks");
 	
-	    out.flush();
+	     out.flush();
 	 }	
    
 }

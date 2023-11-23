@@ -13,14 +13,14 @@ public class Sever {
 	public static void main(String[] args) throws IOException {
 		final int SBAP_PORT = 8888;
 		ServerSocket server = new ServerSocket(SBAP_PORT);
-		System.out.println("Waiting for clients to connect...");
+		System.out.println("Server is running, waiting for clients to connect...");
 	
 	
 		while (true) {
 			Socket s = server.accept();
 			MusicRequest musicRequest = new MusicRequest(s);
 			Thread t = new Thread(musicRequest);
-			t.start();
+			t.start(); 
 		}
 	}
 }
