@@ -14,7 +14,7 @@ public class Sever {
 		final int SBAP_PORT = 8888;
 		ServerSocket server = new ServerSocket(SBAP_PORT);
 		System.out.println("Server is running, waiting for clients to connect...");
-	
+		
 	
 		while (true) {
 			Socket s = server.accept();

@@ -17,12 +17,12 @@ public class ClientController {
       Scanner in = new Scanner(instream);
       PrintWriter out = new PrintWriter(outstream); 
       
-      String command = "RETRIEVE ALL ALL 0 ALL";
+      String command = "RETRIEVE ALL ALL 0 ALL\n";
       System.out.print("Sending: " + command);
       out.print(command);
       out.flush();
-//      String response = in.nextLine();
-//      System.out.println("Receiving: " + response);
+      String response = in.nextLine();
+      System.out.println("Receiving: " + response);
       
       
       s.close();

@@ -79,27 +79,26 @@ public class MusicRequest implements Runnable {
 	 */
 	 public void executeCommand(String command) {
 		 
-		 System.out.println("Command at start of executeCommand is " + command);
+		System.out.println("Command at start of executeCommand is " + command);
 		 
-		 String type = "";
-		 String brand = "";
-		 String maxCost = "";
-		 String location = "";
+		String type = "";
+		String brand = "";
+		double maxCost = 0;
+		String location = "";
 		 
-		 if (command.equals("RETRIEVE")) {
-			 type = in.next();
-			 brand = in.next();
-			 maxCost = in.next();
-			 location = in.next();
-		 }
+		if (command.equals("RETRIEVE")) {
+			type = in.next();
+			brand = in.next();
+			maxCost = in.nextDouble();
+			location = in.next();
+		}
 		 
-		 System.out.println("Here is what I got from the client");
+		System.out.println("Here is what I got from the client");
 		 
-		 System.out.println("Type is: " + type + "\nBrand is: " + brand + "\nMax Cost is: " + maxCost + "\nLocation is: " + location);
-		 
-		 out.print("Thanks");
-	
-	     out.flush();
+		System.out.println("Type is: " + type + "\nBrand is: " + brand + "\nMax Cost is: " + maxCost + "\nLocation is: " + location);
+ 
+		out.println("Thanks for the info");
+		out.flush();
 	 }	
    
 }
