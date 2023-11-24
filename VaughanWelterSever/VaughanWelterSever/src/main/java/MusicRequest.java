@@ -35,8 +35,9 @@ public class MusicRequest implements Runnable {
          try
          {	
            // Try creating the db, drop it first, then create the db.
+        	 instrumentDB = new InstrumentDB();
     	   try {
-    			instrumentDB = new InstrumentDB();
+    			
     		} catch (Exception e) {
     			// TODO Auto-generated catch block
     			e.printStackTrace();
@@ -45,7 +46,10 @@ public class MusicRequest implements Runnable {
             in = new Scanner(s.getInputStream());
             out = new PrintWriter(s.getOutputStream());
             doService();            
-         }
+         } catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
          finally
          {
             s.close();
@@ -91,6 +95,11 @@ public class MusicRequest implements Runnable {
 			brand = in.next();
 			maxCost = in.nextDouble();
 			location = in.next();
+			
+			String queryString = queryStringBuilder(type, brand, maxCost, location);
+			System.out.println(queryString);
+			String queryResponse = executeQuery(queryString);
+			System.out.println(queryResponse);
 		}
 		 
 		System.out.println("Here is what I got from the client");
@@ -99,6 +108,59 @@ public class MusicRequest implements Runnable {
  
 		out.println("Thanks for the info");
 		out.flush();
-	 }	
+	 }
+	 
+	 public String queryStringBuilder(String type, String brand, Double maxCost, String location) {
+		 StringBuffer queryString = new StringBuffer();
+		 // u will be shorthand for table Instruments
+		 // x will be shorthand for table Locations
+		 // b will be shorthand for table Inventory
+//		 queryString.append("SELECT u.instName u.descrip u.cost b.quantity x.address ");
+//		 queryString.append("FROM Instruments u Locations x Inventory b ");
+//		 queryString.append("JOIN u ON u.instName = b.iNumber");
+//		 queryString.append("JOIN x ON x.locNumber = b.lNumber");
+		 
+		 
+		 
+		 
+		 queryString.append("""
+				SELECT
+				    u.instName,
+				    u.descrip,
+				    u.cost,
+				    b.quantity,
+				    x.address
+				FROM
+				    Instruments u
+				JOIN
+				    Inventory b ON u.instName = b.iNumber
+				JOIN
+				    Locations x ON x.locNumber = b.lNumber
+		 		""");
+		 
+//		 if (type != "ALL") {
+//			 
+//		 }
+		 
+		 return queryString.toString();
+	 }
+	 
+	 public String executeQuery(String queryString) {
+		 
+		 
+		 
+		 String response;
+		try {
+			response = instrumentDB.runQueries(queryString);
+			return response;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "Failed query";
+	 }
+	 
+	 
+	 
    
 }

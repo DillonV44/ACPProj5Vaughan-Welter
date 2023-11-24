@@ -119,5 +119,12 @@ public class InstrumentDB {
          ResultSet result = stat.executeQuery("SELECT * FROM Inventory");
          return result;
    }
+	
+	public String runQueries(String queryString) throws Exception {
+		
+		
+		ResultSet resultSet = stat.executeQuery(queryString);
+		return resultSet.toString();
+	}
 
 }
