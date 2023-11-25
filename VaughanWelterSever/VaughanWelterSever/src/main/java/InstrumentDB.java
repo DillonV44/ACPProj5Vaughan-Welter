@@ -11,10 +11,13 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class InstrumentDB {
 	Connection con;
 	Statement stat;
+	private Lock sqlAccessLock;
    
     /*
 	 * InstrumentDB constructor
@@ -23,11 +26,14 @@ public class InstrumentDB {
 		SimpleDataSource.init("database.properties");
 		con = SimpleDataSource.getConnection();
 		stat = con.createStatement();
+		sqlAccessLock = new ReentrantLock();
 
 		try {
+			sqlAccessLock.lock();
 			stat.execute("DROP TABLE Instruments");
 			stat.execute("DROP TABLE Locations");
 			stat.execute("DROP TABLE Inventory");
+			sqlAccessLock.unlock();
 		} 
       catch (Exception e) {
 			System.err.println("Attempted to drop tables, tables did not exist!");
@@ -43,12 +49,14 @@ public class InstrumentDB {
 	 */
 	public void endDB() throws SQLException {
 		try {
+			sqlAccessLock.lock();
 			stat.execute("DROP TABLE Instruments");
 			stat.execute("DROP TABLE Locations");
 			stat.execute("DROP TABLE Inventory");
 		} catch (Exception e) {
 			System.err.println("Error, failed to drop tables!");
 		} finally {
+			sqlAccessLock.unlock();
 			con.close();
 			System.out.println("Dropped Tables, closed connection and ending program");
 		}
@@ -60,7 +68,8 @@ public class InstrumentDB {
      * @return Instruments table
 	 */
 	public ResultSet createInstruments(Statement stat) throws Exception
-   {
+   {	
+		 sqlAccessLock.lock();
          stat.execute("CREATE TABLE Instruments (instName CHAR(12),instNumber INTEGER,cost DOUBLE,descrip CHAR(20))");
          stat.execute("INSERT INTO Instruments VALUES ('guitar',1,100.0,'yamaha')");
          stat.execute("INSERT INTO Instruments VALUES ('guitar',2,500.0,'gibson')");
@@ -70,6 +79,7 @@ public class InstrumentDB {
          stat.execute("INSERT INTO Instruments VALUES ('drums',6,1500.0,'ludwig')");
          stat.execute("INSERT INTO Instruments VALUES ('drums',7,400.0,'yamaha')");
          ResultSet result = stat.executeQuery("SELECT * FROM Instruments");
+         sqlAccessLock.unlock();
          return result;
    }
    
@@ -79,12 +89,14 @@ public class InstrumentDB {
      * @return Locations table
 	 */
 	public ResultSet createLocations(Statement stat) throws Exception
-   {
+   {	
+		 sqlAccessLock.lock();
          stat.execute("CREATE TABLE Locations (locName CHAR(12),locNumber INTEGER,address CHAR(50))");
          stat.execute("INSERT INTO Locations VALUES ('PNS',1,'Pensacola Florida')");
          stat.execute("INSERT INTO Locations VALUES ('CLT',2,'Charlotte North Carolina')");
          stat.execute("INSERT INTO Locations VALUES ('DFW',3,'Dallas Fort Worth Texas')");
          ResultSet result = stat.executeQuery("SELECT * FROM Locations");
+         sqlAccessLock.unlock();
          return result;
    }
    
@@ -94,7 +106,8 @@ public class InstrumentDB {
      * @return Inventory table
 	 */
 	public ResultSet createInventory(Statement stat) throws Exception
-   {
+   {	
+		 sqlAccessLock.lock();
          stat.execute("CREATE TABLE Inventory (iNumber INTEGER,lNumber INTEGER,quantity INTEGER)");
          stat.execute("INSERT INTO Inventory VALUES (1,1,15)");
          stat.execute("INSERT INTO Inventory VALUES (1,2,27)");
@@ -118,6 +131,7 @@ public class InstrumentDB {
          stat.execute("INSERT INTO Inventory VALUES (7,2,4)");
          stat.execute("INSERT INTO Inventory VALUES (7,3,12)");     
          ResultSet result = stat.executeQuery("SELECT * FROM Inventory");
+         sqlAccessLock.unlock();
          return result;
    }
 	
@@ -126,16 +140,25 @@ public class InstrumentDB {
 	 * a ResultSet Object that is then parsed in the runResult method to be returned
 	 * as a single string.
 	 * @param queryString
-	 * @return
+	 * @return will return a result string based on the query
 	 * @throws Exception
 	 */
 	public String runQueries(String queryString) throws Exception {
+		sqlAccessLock.lock();
+		// Get the ResultSet object from executing the query string
 		ResultSet resultSet = stat.executeQuery(queryString);
+		sqlAccessLock.unlock();
 		return runResult(resultSet);
 	}
 	
-	
-	
+	/**
+	 * runResult will translate the ResultSet object to a nicely
+	 * formated return string to be sent to the client
+	 * @param result is the ResultSet object created in the 
+	 * runQueries method
+	 * @return returns a nicely formated string to be sent to the client
+	 * @throws Exception will be thrown if ResultSet can not be accessed
+	 */
 	public String runResult(ResultSet result) throws Exception {
 		StringBuffer queryResult = new StringBuffer();
 		System.out.println("Translating return object of queries into a readable format");
