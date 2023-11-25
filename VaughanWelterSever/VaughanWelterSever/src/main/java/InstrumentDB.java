@@ -8,6 +8,7 @@ COP4027	Project #: 5
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -120,11 +121,38 @@ public class InstrumentDB {
          return result;
    }
 	
+	/**
+	 * Method runQueries will run the query string passed in and generate
+	 * a ResultSet Object that is then parsed in the runResult method to be returned
+	 * as a single string.
+	 * @param queryString
+	 * @return
+	 * @throws Exception
+	 */
 	public String runQueries(String queryString) throws Exception {
-		
-		
 		ResultSet resultSet = stat.executeQuery(queryString);
-		return resultSet.toString();
+		return runResult(resultSet);
+	}
+	
+	
+	
+	public String runResult(ResultSet result) throws Exception {
+		StringBuffer queryResult = new StringBuffer();
+		System.out.println("Translating return object of queries into a readable format");
+		ResultSetMetaData rsm = result.getMetaData();
+		int cols = rsm.getColumnCount();
+		while(result.next())
+		{
+			for(int i = 1; i <= cols; i++) {
+				queryResult.append(result.getString(i)+" ");
+				System.out.print(result.getString(i)+" ");
+			}
+			queryResult.append(" ");
+			System.out.println("");      
+		}
+		
+		return queryResult.toString();
+
 	}
 
 }

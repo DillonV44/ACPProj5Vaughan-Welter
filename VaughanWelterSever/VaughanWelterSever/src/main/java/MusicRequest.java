@@ -89,6 +89,8 @@ public class MusicRequest implements Runnable {
 		String brand = "";
 		double maxCost = 0;
 		String location = "";
+		
+		String queryResponse = "NULL";
 		 
 		if (command.equals("RETRIEVE")) {
 			type = in.next();
@@ -98,7 +100,7 @@ public class MusicRequest implements Runnable {
 			
 			String queryString = queryStringBuilder(type, brand, maxCost, location);
 			System.out.println(queryString);
-			String queryResponse = executeQuery(queryString);
+			queryResponse = executeQuery(queryString);
 			System.out.println(queryResponse);
 		}
 		 
@@ -106,22 +108,12 @@ public class MusicRequest implements Runnable {
 		 
 		System.out.println("Type is: " + type + "\nBrand is: " + brand + "\nMax Cost is: " + maxCost + "\nLocation is: " + location);
  
-		out.println("Thanks for the info");
+		out.println(queryResponse);
 		out.flush();
 	 }
 	 
 	 public String queryStringBuilder(String type, String brand, Double maxCost, String location) {
 		 StringBuffer queryString = new StringBuffer();
-		 // u will be shorthand for table Instruments
-		 // x will be shorthand for table Locations
-		 // b will be shorthand for table Inventory
-//		 queryString.append("SELECT u.instName u.descrip u.cost b.quantity x.address ");
-//		 queryString.append("FROM Instruments u Locations x Inventory b ");
-//		 queryString.append("JOIN u ON u.instName = b.iNumber");
-//		 queryString.append("JOIN x ON x.locNumber = b.lNumber");
-		 
-		 
-		 
 		 
 		 queryString.append("""
 				SELECT
@@ -133,14 +125,15 @@ public class MusicRequest implements Runnable {
 				FROM
 				    Instruments u
 				JOIN
-				    Inventory b ON u.instName = b.iNumber
+				    Inventory b ON u.instNumber = b.iNumber
 				JOIN
 				    Locations x ON x.locNumber = b.lNumber
 		 		""");
 		 
-//		 if (type != "ALL") {
-//			 
-//		 }
+		 if (type != "ALL") {
+			 queryString.append("WHERE u.instName = '" + type + "'");
+			 
+		 }
 		 
 		 return queryString.toString();
 	 }
