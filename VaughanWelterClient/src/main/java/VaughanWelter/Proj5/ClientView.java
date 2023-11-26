@@ -9,6 +9,14 @@ COP4027	Project #: 5
 package VaughanWelter.Proj5;
 
 import javafx.scene.text.Text;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.Scanner;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -26,7 +34,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class Client extends Application{
+public class ClientView extends Application{
 	
 	private static final int WINDOW_WIDTH = 520;
 	private static final int WINDOW_HEIGHT = 350;
@@ -34,9 +42,9 @@ public class Client extends Application{
 	private static final int SPACING1 = 40;
 	private static final int SPACING2 = 90;
 	private static final int INTIAL_VAL = 0;
-	private static final String DEVICES[] = {"guitar", "bass", "keyboard", "drums", "All"};
-	private static final String COMPANIES[] = {"yamaha", "gibson", "fender", "roland", "alesis", "ludwig"};
-	private static final String PLACES[] = {"PNS", "CLT", "DFW", "All"};
+	private static final String DEVICES[] = {"ALL", "guitar", "bass", "keyboard", "drums"};
+    private static final String COMPANIES[] = {"ALL", "yamaha", "gibson", "fender", "roland", "alesis", "ludwig"};
+    private static final String PLACES[] = {"ALL", "PNS", "CLT", "DFW"};
 	private ComboBox<String> instrument;
 	private ComboBox<String> brand;
 	private ComboBox<String> local;
@@ -46,13 +54,42 @@ public class Client extends Application{
 	private String tool;
 	private String mfr;
 	private String storage;
+	private StringBuffer command = new StringBuffer();
 	
-	public static void main(String[] args) {
-		Application.launch(args);
-	}
+    static Socket s;
+    static InputStream instream;
+    static OutputStream outstream;
+    static Scanner in;
+    static PrintWriter out;
+	
+    
+    
+//    public void applicaitonLaunch(String[] args) {
+//		 
+//	}
+	
+	   public static void main(String[] args) throws IOException
+	   {
+		  
+		   
+		    final int SBAP_PORT = 8888;
+		    s = new Socket("localhost", SBAP_PORT);
+		    instream = s.getInputStream();
+		    outstream = s.getOutputStream();
+		    in = new Scanner(instream);
+		    out = new PrintWriter(outstream); 
+		  
+	      
+
+	      Application.launch(args);
+	   }
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+
+		
+		
+		
 	    priceRange = new TextField();
 	    Label textErrorLabel = new Label();
 	    textErrorLabel.setTextFill(Color.RED);
@@ -75,6 +112,23 @@ public class Client extends Application{
 				tool = instrument.getValue();
 				mfr = brand.getValue();
 				storage = local.getValue();
+				int location = setLocation(storage);
+				
+				command.append("RETRIEVE " + tool + " " + mfr + " " + price + " " + location + "\n");
+				
+				System.out.println(command.toString());
+				
+				try {
+			   System.out.println("Sending command to server: " + command);
+	           out.print(command);
+	           out.flush();
+	           String response = in.nextLine();
+	           System.out.println("Receiving: " + response + "\n");
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+				
+				clearStringBuffer();
 	    		Platform.runLater(new Runnable(){
 	        		@Override
 	        		public void run() {
@@ -142,6 +196,10 @@ public class Client extends Application{
     	
 	}
 	
+	public void clearStringBuffer() {
+		command.setLength(0);
+	}	
+	
 	public String getInstrument() {
 		return tool;
 	}
@@ -156,5 +214,32 @@ public class Client extends Application{
 	
 	public String getLocation() {
 		return storage;
+	}
+	
+	public String getCommand() {
+		return command.toString();
+	}
+	
+	
+	public int setLocation(String loc) {
+		
+		// {"PNS" = 1, "CLT" = 2, "DFW" = 3, "All"};
+		
+		if (loc.contains("PNS")) {
+			return 1;
+		}
+		
+		
+		if (loc.contains("CLT")) {
+			return 2;
+		}
+		
+		if (loc.contains("DFW")) {
+			return 3;
+		}
+		
+		return 0;
+		
+		
 	}
 }

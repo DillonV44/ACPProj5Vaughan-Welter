@@ -61,7 +61,6 @@ public class MusicRequest implements Runnable {
       }
    }
    
-   
     /**
 	*  Executes all commands until the end of input.
 	*/
@@ -101,6 +100,8 @@ public class MusicRequest implements Runnable {
 			brand = in.next();
 			maxCost = in.nextDouble();
 			location = in.nextInt();
+			System.out.println("I made it this far!");
+			System.out.println("Type is: " + type + "\nBrand is: " + brand + "\nMax Cost is: " + maxCost + "\nLocation is: " + location);
 			
 			// Build the query string to search the database
 			String queryString = queryStringBuilder(type, brand, maxCost, location);
