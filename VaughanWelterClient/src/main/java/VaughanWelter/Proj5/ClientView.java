@@ -43,14 +43,13 @@ public class ClientView extends Application{
 	private static final int SPACING2 = 90;
 	private static final int INTIAL_VAL = 0;
 	private static final String DEVICES[] = {"ALL", "guitar", "bass", "keyboard", "drums"};
-    private static final String COMPANIES[] = {"ALL", "yamaha", "gibson", "fender", "roland", "alesis", "ludwig"};
-    private static final String PLACES[] = {"ALL", "PNS", "CLT", "DFW"};
+    	private static final String COMPANIES[] = {"ALL", "yamaha", "gibson", "fender", "roland", "alesis", "ludwig"};
+    	private static final String PLACES[] = {"ALL", "PNS", "CLT", "DFW"};
 	private ComboBox<String> instrument;
 	private ComboBox<String> brand;
 	private ComboBox<String> local;
 	private TextField priceRange;
 	private double price;
-	private boolean validPrice;
 	private String tool;
 	private String mfr;
 	private String storage;
@@ -86,29 +85,19 @@ public class ClientView extends Application{
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-
-		
-		
-		
 	    priceRange = new TextField();
-	    Label textErrorLabel = new Label();
-	    textErrorLabel.setTextFill(Color.RED);
 	    
 	    Button submit = new Button("Submit Request");
 		
 		submit.setOnAction((ActionEvent event) -> {
 			try {
-				price = Double.parseDouble(priceRange.getText());
-				textErrorLabel.setText("");
-				priceRange.setStyle(null);
-				validPrice = true;
+				if(priceRange.getText() == "null")
+					price = 0.0;
+				else
+					price = Double.parseDouble(priceRange.getText());
 			}
-			catch(NumberFormatException e){
-				validPrice = false;
-				textErrorLabel.setText("Invalid entry, please enter a value.");
-				priceRange.setStyle("-fx-control-inner-background: red;");
-			}
-			if(validPrice) {
+			catch(NumberFormatException e) {}
+
 				tool = instrument.getValue();
 				mfr = brand.getValue();
 				storage = local.getValue();
@@ -143,7 +132,7 @@ public class ClientView extends Application{
 //	    		System.out.println(getBrand());
 //	    		System.out.println(getPrice());
 //	    		System.out.println(getLocation());
-			}
+			
         });
 		
 	instrument = new ComboBox<String>();
@@ -167,8 +156,7 @@ public class ClientView extends Application{
     	label.setMinHeight(SPACING1);
     	
     	HBox cost = new HBox(new Text("Maximum Cost: "), priceRange);
-    	VBox costFinal = new VBox(cost, textErrorLabel);
-    	costFinal.setMinHeight(SPACING2);
+    	cost.setMinHeight(SPACING2);
     	
     	HBox location = new HBox(new Text("Warehouse Location: "), local);
     	
@@ -176,15 +164,14 @@ public class ClientView extends Application{
     	btn.setMinHeight(SPACING2);
     	
 	VBox categories = new VBox();
-	
-	costFinal.setAlignment(Pos.CENTER);
+
 	type.setAlignment(Pos.CENTER);
 	label.setAlignment(Pos.CENTER);
 	cost.setAlignment(Pos.CENTER);
 	location.setAlignment(Pos.CENTER);
 	btn.setAlignment(Pos.CENTER);
 
-	categories.getChildren().addAll(type, label, costFinal, location, btn);
+	categories.getChildren().addAll(type, label, cost, location, btn);
 		
     	panes.setTop(categories);
     	
