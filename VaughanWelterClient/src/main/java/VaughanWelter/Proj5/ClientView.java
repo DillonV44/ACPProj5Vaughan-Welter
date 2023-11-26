@@ -34,9 +34,9 @@ public class Client extends Application{
 	private static final int SPACING1 = 40;
 	private static final int SPACING2 = 90;
 	private static final int INTIAL_VAL = 0;
-	private static final String DEVICES[] = {"guitar", "bass", "keyboard", "drums", "All"};
-	private static final String COMPANIES[] = {"yamaha", "gibson", "fender", "roland", "alesis", "ludwig"};
-	private static final String PLACES[] = {"PNS", "CLT", "DFW", "All"};
+	private static final String DEVICES[] = {"All", "guitar", "bass", "keyboard", "drums"};
+	private static final String COMPANIES[] = {"All", "yamaha", "gibson", "fender", "roland", "alesis", "ludwig"};
+	private static final String PLACES[] = {"All", "PNS", "CLT", "DFW"};
 	private ComboBox<String> instrument;
 	private ComboBox<String> brand;
 	private ComboBox<String> local;
