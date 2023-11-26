@@ -110,6 +110,7 @@ public class MusicRequest implements Runnable {
 			queryResponse = executeQuery(queryString);
 			System.out.println(queryResponse);
 		}
+		
 		 
 		System.out.println("Here is what I got from the client");
 		
@@ -132,6 +133,25 @@ public class MusicRequest implements Runnable {
 	 public String queryStringBuilder(String type, String brand, Double maxCost, int location) {
 		 StringBuffer queryString = new StringBuffer();
 		 
+		 boolean nonDefaultType = false;
+		 boolean nonDefaultBrand = false;
+		 boolean nonDefaultMaxCost = false;
+		 boolean nonDefaultLoction = false;
+		 boolean whereUsed = false;
+		 
+		 if (!type.contains("All")) {
+			 nonDefaultType = true;
+		 }
+		 if (!brand.contains("All")) {
+			 nonDefaultBrand = true;
+		 }
+		 if (maxCost != 0) {
+			 nonDefaultMaxCost = true;
+		 }
+		 if (location != 0) {
+			 nonDefaultLoction = true;
+		 }
+		 
 		 // query string is the query string object and always starts out the same way
 		 queryString.append("""
 				SELECT
@@ -151,30 +171,91 @@ public class MusicRequest implements Runnable {
 		 // These if and else if statements ensure that a good SQL query is built. Each 
 		 // parameter ensure that it is either the second value to be searched for, or the
 		 // first 
-		 if (!type.contains("ALL")) {
-			 queryString.append("WHERE u.instName = '" + type + "'");
+
+		 
+		 
+		 if (nonDefaultType) {
+			 if (whereUsed) {
+				 queryString.append(" AND u.instName = '" + type + "' \n");
+			 } else {
+				 queryString.append("WHERE u.instName = '" + type + "' \n");
+				 whereUsed = true;
+			 }
 		 }
 		 
-		 if (!type.contains("ALL") && !brand.contains("ALL")) {
-			 queryString.append("\nAND u.descrip = '" + brand + "'");
-		 }
-		 else if (!brand.contains("ALL")) {
-			 queryString.append("WHERE u.descrip = '" + brand + "'");
-		 }
-		 
-		 if (!type.contains("ALL") && !brand.contains("ALL") && maxCost != 0) {
-			 queryString.append("\nAND u.cost < " + maxCost + "");
-		 }
-		 else if (maxCost != 0) {
-			 queryString.append("WHERE u.cost < " + maxCost + "");
+		 if (nonDefaultBrand) {
+			 if (whereUsed) {
+				 queryString.append(" AND u.descrip = '" + brand + "' \n");
+			 } else {
+				 queryString.append("WHERE u.descrip = '" + brand + "' \n");
+				 whereUsed = true;
+			 }
 		 }
 		 
-		 if (!type.contains("ALL") && !brand.contains("ALL") && maxCost != 0 && location != 0) {
-			 queryString.append("\nAND b.lNumber = " + location + "");
+		 if (nonDefaultMaxCost) {
+			 if (whereUsed) {
+				 queryString.append("AND u.cost <= " + maxCost + " \n");
+			 } else {
+				 queryString.append("WHERE u.cost <= " + maxCost + " \n");
+				 whereUsed = true;
+			 }
 		 }
-		 else if (location != 0) {
-			 queryString.append("WHERE b.lNumber = " + location + "");
+		 
+		 if (nonDefaultLoction) {
+			 if (whereUsed) {
+				 queryString.append("AND b.lNumber = " + location + " \n");
+			 } else {
+				 queryString.append("WHERE b.lNumber = " + location + " \n");
+				 whereUsed = true;
+			 }
 		 }
+		 
+		 
+//		 if (!type.contains("All") && !brand.contains("All") && maxCost != 0 && location != 0) {
+//			 queryString.append("WHERE u.instName = '" + type + "' \n");
+//			 queryString.append("AND u.descrip = '" + brand + "' \n");
+//			 queryString.append("AND u.cost < " + maxCost + " \n");
+//			 queryString.append("AND b.lNumber = " + location + " \n");
+//		 }
+//		 
+//		 if (!type.contains("All") && !brand.contains("All") && maxCost != 0) {
+//			 queryString.append("WHERE u.instName = '" + type + "' \n");
+//			 queryString.append("AND u.descrip = '" + brand + "' \n");
+//			 queryString.append("AND u.cost < " + maxCost + " \n");
+//		 }
+//		 
+//		 if (!type.contains("All") && !brand.contains("All")) {
+//			 queryString.append("WHERE u.instName = '" + type + "' \n");
+//			 queryString.append("AND u.descrip = '" + brand + "' \n");
+//		 }
+//		 
+//		 if (!brand.contains("All") && maxCost != 0 && location != 0) {
+//			 queryString.append("WHERE u.descrip = '" + brand + "' \n");
+//			 queryString.append("AND u.cost < " + maxCost + " \n");
+//			 queryString.append("AND b.lNumber = " + location + " \n");
+//		 }
+//		 
+//		 if (maxCost != 0 && location != 0) {
+//			 queryString.append("WHERE u.cost < " + maxCost + " \n");
+//			 queryString.append("AND b.lNumber = " + location + " \n");
+//		 }
+//		 
+//		 if (!type.contains("All") && brand.contains("All") && maxCost == 0 && location == 0) {
+//			 queryString.append("WHERE u.instName = '" + type + "' \n");
+//		 }
+//		 
+//		 if (!brand.contains("All") && type.contains("All") && maxCost == 0 && location == 0) {
+//			 queryString.append("WHERE u.descrip = '" + brand + "' \n");
+//		 }
+//		 
+//		 if (maxCost != 0 && type.contains("All") && brand.contains("All") && location == 0) {
+//			 queryString.append("WHERE u.cost < " + maxCost + " \n");
+//		 }
+//		 
+//		 if (location != 0 && type.contains("All") && brand.contains("All") && maxCost == 0) {
+//			 queryString.append("WHERE b.lNumber = " + location + " \n");
+//		 }
+		 
 		 
 		 return queryString.toString();
 	 }

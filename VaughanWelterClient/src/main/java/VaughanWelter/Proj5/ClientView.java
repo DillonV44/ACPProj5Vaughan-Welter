@@ -36,15 +36,16 @@ import javafx.stage.Stage;
 
 public class ClientView extends Application{
 	
+	private static final int DIALOG_WIDTH = 500;
 	private static final int WINDOW_WIDTH = 520;
 	private static final int WINDOW_HEIGHT = 350;
 	private static final int HEADER_SPACE = 80;
 	private static final int SPACING1 = 40;
 	private static final int SPACING2 = 90;
 	private static final int INTIAL_VAL = 0;
-	private static final String DEVICES[] = {"ALL", "guitar", "bass", "keyboard", "drums"};
-    	private static final String COMPANIES[] = {"ALL", "yamaha", "gibson", "fender", "roland", "alesis", "ludwig"};
-    	private static final String PLACES[] = {"ALL", "PNS", "CLT", "DFW"};
+	private static final String DEVICES[] = {"All", "guitar", "bass", "keyboard", "drums"};
+	private static final String COMPANIES[] = {"All", "yamaha", "gibson", "fender", "roland", "alesis", "ludwig"};
+	private static final String PLACES[] = {"All", "PNS", "CLT", "DFW"};
 	private ComboBox<String> instrument;
 	private ComboBox<String> brand;
 	private ComboBox<String> local;
@@ -54,33 +55,24 @@ public class ClientView extends Application{
 	private String mfr;
 	private String storage;
 	private StringBuffer command = new StringBuffer();
-	
+	String formattedAlert = "";
     static Socket s;
     static InputStream instream;
     static OutputStream outstream;
     static Scanner in;
     static PrintWriter out;
 	
-    
-    
-//    public void applicaitonLaunch(String[] args) {
-//		 
-//	}
-	
 	   public static void main(String[] args) throws IOException
 	   {
-		  
-		   
 		    final int SBAP_PORT = 8888;
 		    s = new Socket("localhost", SBAP_PORT);
 		    instream = s.getInputStream();
 		    outstream = s.getOutputStream();
 		    in = new Scanner(instream);
 		    out = new PrintWriter(outstream); 
-		  
-	      
-
-	      Application.launch(args);
+	        Application.launch(args);
+	        s.close();
+	        System.exit(0);
 	   }
 
 	@Override
@@ -113,9 +105,13 @@ public class ClientView extends Application{
 	           out.flush();
 	           String response = in.nextLine();
 	           System.out.println("Receiving: " + response + "\n");
+	           formattedAlert = formatAlert(response);
+	           System.out.println("--------CLIENT FOMRATTED---------");
+	           System.out.println(formattedAlert);
+	           System.out.println("------CLIENT FOMRATTED END---------");
 				} catch (Exception e) {
 					System.out.println(e);
-				}
+				} 
 				
 				clearStringBuffer();
 	    		Platform.runLater(new Runnable(){
@@ -124,15 +120,11 @@ public class ClientView extends Application{
 	        			Alert alert = new Alert(AlertType.INFORMATION);
 	                    alert.setTitle("Instrument Information");
 	                    alert.setHeaderText("Results");
-	                    alert.setContentText("data");
+	                    alert.setContentText(formattedAlert);
+	                    alert.getDialogPane().setMinWidth(DIALOG_WIDTH);
 	                    alert.showAndWait();
 	        		}
 	        	});
-//	    		System.out.println(getInstrument());
-//	    		System.out.println(getBrand());
-//	    		System.out.println(getPrice());
-//	    		System.out.println(getLocation());
-			
         });
 		
 	instrument = new ComboBox<String>();
@@ -207,26 +199,27 @@ public class ClientView extends Application{
 		return command.toString();
 	}
 	
-	
 	public int setLocation(String loc) {
-		
 		// {"PNS" = 1, "CLT" = 2, "DFW" = 3, "All"};
-		
 		if (loc.contains("PNS")) {
 			return 1;
 		}
-		
-		
 		if (loc.contains("CLT")) {
 			return 2;
 		}
-		
 		if (loc.contains("DFW")) {
 			return 3;
 		}
-		
 		return 0;
+	}
+	
+	public String formatAlert(String returnString) {
+		StringBuffer stringBuffer = new StringBuffer();
+		String returnObjects[] = returnString.split(",");
 		
-		
+		for (int i = 0; i < returnObjects.length; i ++) {
+			stringBuffer.append(returnObjects[i] + "\n");
+		}
+		return stringBuffer.toString();
 	}
 }

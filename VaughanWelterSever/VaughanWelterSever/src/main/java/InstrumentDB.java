@@ -170,7 +170,7 @@ public class InstrumentDB {
 				queryResult.append(result.getString(i)+" ");
 				System.out.print(result.getString(i)+" ");
 			}
-			queryResult.append(" ");
+			queryResult.append(",");
 			System.out.println("");      
 		}
 		
