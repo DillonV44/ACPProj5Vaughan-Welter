@@ -29,11 +29,9 @@ public class InstrumentDB {
 		sqlAccessLock = new ReentrantLock();
 
 		try {
-			sqlAccessLock.lock();
 			stat.execute("DROP TABLE Instruments");
 			stat.execute("DROP TABLE Locations");
 			stat.execute("DROP TABLE Inventory");
-			sqlAccessLock.unlock();
 		} 
       catch (Exception e) {
 			System.err.println("Attempted to drop tables, tables did not exist!");
@@ -49,14 +47,12 @@ public class InstrumentDB {
 	 */
 	public void endDB() throws SQLException {
 		try {
-			sqlAccessLock.lock();
 			stat.execute("DROP TABLE Instruments");
 			stat.execute("DROP TABLE Locations");
 			stat.execute("DROP TABLE Inventory");
 		} catch (Exception e) {
 			System.err.println("Error, failed to drop tables!");
 		} finally {
-			sqlAccessLock.unlock();
 			con.close();
 			System.out.println("Dropped Tables, closed connection and ending program");
 		}
@@ -68,7 +64,6 @@ public class InstrumentDB {
      * @return Instruments table
 	 */
 	public ResultSet createInstruments(Statement stat) throws Exception{	
-		 sqlAccessLock.lock();
          stat.execute("CREATE TABLE Instruments (instName CHAR(12),instNumber INTEGER,cost DOUBLE,descrip CHAR(20))");
          stat.execute("INSERT INTO Instruments VALUES ('guitar',1,100.0,'yamaha')");
          stat.execute("INSERT INTO Instruments VALUES ('guitar',2,500.0,'gibson')");
@@ -77,6 +72,7 @@ public class InstrumentDB {
          stat.execute("INSERT INTO Instruments VALUES ('keyboard',5,500.0,'alesis')");
          stat.execute("INSERT INTO Instruments VALUES ('drums',6,1500.0,'ludwig')");
          stat.execute("INSERT INTO Instruments VALUES ('drums',7,400.0,'yamaha')");
+         sqlAccessLock.lock();
          ResultSet result = stat.executeQuery("SELECT * FROM Instruments");
          sqlAccessLock.unlock();
          return result;
@@ -88,11 +84,11 @@ public class InstrumentDB {
      * @return Locations table
 	 */
 	public ResultSet createLocations(Statement stat) throws Exception {	
-		 sqlAccessLock.lock();
          stat.execute("CREATE TABLE Locations (locName CHAR(12),locNumber INTEGER,address CHAR(50))");
          stat.execute("INSERT INTO Locations VALUES ('PNS',1,'Pensacola Florida')");
          stat.execute("INSERT INTO Locations VALUES ('CLT',2,'Charlotte North Carolina')");
          stat.execute("INSERT INTO Locations VALUES ('DFW',3,'Dallas Fort Worth Texas')");
+         sqlAccessLock.lock();
          ResultSet result = stat.executeQuery("SELECT * FROM Locations");
          sqlAccessLock.unlock();
          return result;
@@ -104,7 +100,6 @@ public class InstrumentDB {
      * @return Inventory table
 	 */
 	public ResultSet createInventory(Statement stat) throws Exception {	
-		 sqlAccessLock.lock();
          stat.execute("CREATE TABLE Inventory (iNumber INTEGER,lNumber INTEGER,quantity INTEGER)");
          stat.execute("INSERT INTO Inventory VALUES (1,1,15)");
          stat.execute("INSERT INTO Inventory VALUES (1,2,27)");
@@ -126,7 +121,8 @@ public class InstrumentDB {
          stat.execute("INSERT INTO Inventory VALUES (6,3,16)");
          stat.execute("INSERT INTO Inventory VALUES (7,1,16)");
          stat.execute("INSERT INTO Inventory VALUES (7,2,4)");
-         stat.execute("INSERT INTO Inventory VALUES (7,3,12)");     
+         stat.execute("INSERT INTO Inventory VALUES (7,3,12)");
+         sqlAccessLock.lock();
          ResultSet result = stat.executeQuery("SELECT * FROM Inventory");
          sqlAccessLock.unlock();
          return result;
@@ -144,8 +140,9 @@ public class InstrumentDB {
 		sqlAccessLock.lock();
 		// Get the ResultSet object from executing the query string
 		ResultSet resultSet = stat.executeQuery(queryString);
+		String resultsReturned = runResult(resultSet);
 		sqlAccessLock.unlock();
-		return runResult(resultSet);
+		return resultsReturned;
 	}
 	
 	/**
